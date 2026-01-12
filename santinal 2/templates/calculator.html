@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Calculator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='calculator.css') }}">
+</head>
+
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="header-logo">
+            <h1>🌱 Carbon Calculator <span class="live-indicator"></span></h1>
+        </div>
+
+        <div class="header-controls">
+            <!-- Minimalist Theme Toggle -->
+            <div class="theme-switch" id="theme-toggle-btn" title="Toggle Dark/Light Mode">
+                <div class="switch-thumb">☀️</div>
+            </div>
+
+            <!-- Hamburger Menu -->
+            <div class="menu">
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="menu-content">
+                    <a href="{{ url_for('dashboard') }}">Dashboard Overview</a>
+                    <a href="{{ url_for('index') }}">Carbon Credit Verification</a>
+                    <a href="{{ url_for('calculator') }}" class="active-link">Carbon Credit Calculator</a>
+                    <a href="{{ url_for('history') }}">History</a>
+                    <a href="{{ url_for('about') }}">About Us</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== CALCULATOR CONTENT ===== -->
+    <div class="dashboard calculator-layout">
+        <div class="card calculator-card">
+            <h2>Estimate Your Impact</h2>
+            <p>Enter your plantation details to calculate potential carbon credits.</p>
+
+            <form id="calc-form">
+                <div class="form-group">
+                    <label>Tree Species</label>
+                    <select id="species">
+                        <option value="0.5">Teak (High Absorption)</option>
+                        <option value="0.3">Pine (Moderate Absorption)</option>
+                        <option value="0.8">Oak (Very High Absorption)</option>
+                        <option value="0.2">Acacia (Low Absorption)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Number of Trees</label>
+                    <input type="number" id="tree-count" placeholder="e.g. 500">
+                </div>
+
+                <div class="form-group">
+                    <label>Age of Plantation (Years)</label>
+                    <input type="number" id="tree-age" placeholder="e.g. 5">
+                </div>
+
+                <button type="button" onclick="calculateCredits()" class="btn-calculate">Calculate Credits</button>
+            </form>
+        </div>
+
+        <div class="card result-card" id="result-card" style="display: none;">
+            <h2>Calculation Result</h2>
+            <div class="result-box">
+                <div class="result-item">
+                    <span>Estimated Carbon Offset</span>
+                    <strong id="res-offset">0 Tons</strong>
+                </div>
+                <div class="result-item">
+                    <span>Potential Credit Value</span>
+                    <strong id="res-value" style="color: var(--secondary-color);">$0.00</strong>
+                </div>
+            </div>
+            <p style="font-size: 0.8rem; margin-top: 1rem;">*Estimates based on standard biomass indices. Actual
+                verification required for issuance.</p>
+        </div>
+    </div>
+
+    <script>
+        // Menu Toggle
+        const menu = document.querySelector('.menu');
+        const hamburger = document.querySelector('.hamburger');
+        hamburger.addEventListener('click', () => menu.classList.toggle('active'));
+        document.addEventListener('click', (e) => {
+            if (!menu.contains(e.target)) menu.classList.remove('active');
+        });
+
+        // Calculation Logic
+        function calculateCredits() {
+            const speciesFactor = parseFloat(document.getElementById('species').value);
+            const count = parseFloat(document.getElementById('tree-count').value);
+            const age = parseFloat(document.getElementById('tree-age').value);
+
+            if (!count || !age) {
+                alert("Please fill in all fields");
+                return;
+            }
+
+            // Simple Formula: Count * Age * SpeciesFactor = Tons of CO2
+            const offset = (count * age * speciesFactor / 10).toFixed(2);
+            const value = (offset * 12.50).toFixed(2); // Assuming $12.50 per credit
+
+            document.getElementById('res-offset').innerText = offset + " Tons";
+            document.getElementById('res-value').innerText = "$" + value;
+
+            const resultCard = document.getElementById('result-card');
+            resultCard.style.display = 'flex';
+            resultCard.classList.add('fade-in');
+        }
+    </script>
+
+    <script src="{{ url_for('static', filename='theme-toggle.js') }}"></script>
+</body>
+
+</html>

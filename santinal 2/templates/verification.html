@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Carbon Credit Verification | Satellite Command</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styleapp.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+</head>
+
+<body class="verification-page" data-latitude="{{ latitude }}" data-longitude="{{ longitude }}"
+    data-show-results="{{ show_results }}" data-result="{{ result }}" data-explanation="{{ explanation }}"
+    data-ndvi-before="{{ ndvi_before }}" data-ndvi-after="{{ ndvi_after }}" data-ndvi-change="{{ ndvi_change }}"
+    data-area="{{ area }}" data-radius="{{ radius }}">
+
+    <!-- Protocol Warning -->
+    <div id="protocol-warning"
+        style="display: none; background: #ef4444; color: white; text-align: center; padding: 10px; position: sticky; top: 0; z-index: 9999; font-weight: bold;">
+        ⚠️ System Error: You are opening this file directly. Please run 'python app.py' and use http://127.0.0.1:5000 to
+        enable satellite analysis.
+    </div>
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="header-logo">
+            <h1>🌱 Satellite Verification <span class="live-indicator"></span></h1>
+        </div>
+
+        <div class="header-controls">
+            <!-- Minimalist Theme Toggle -->
+            <div class="theme-switch" id="theme-toggle-btn" title="Toggle Dark/Light Mode">
+                <div class="switch-thumb">☀️</div>
+            </div>
+
+            <!-- Hamburger Menu -->
+            <div class="menu">
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="menu-content">
+                    <a href="{{ url_for('dashboard') }}">Dashboard Overview</a>
+                    <a href="{{ url_for('index') }}" class="active-link">Carbon Credit Verification</a>
+                    <a href="{{ url_for('calculator') }}">Carbon Credit Calculator</a>
+                    <a href="{{ url_for('history') }}">History</a>
+                    <a href="{{ url_for('about') }}">About Us</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="content-wrapper">
+
+        <!-- ===== MAP PORTAL ===== -->
+        <section class="map-section">
+            <div class="section-badge">Satellite Portal</div>
+            <div id="map-container" class="glass-frame">
+                <div id="map"></div>
+                <div class="map-overlay">
+                    <div class="coord-display">
+                        <span id="display-lat">0.000000</span>, <span id="display-lon">0.000000</span>
+                    </div>
+                    <div class="status-chip">Targeting Active</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== CONTROL PANEL ===== -->
+        <section class="control-section">
+            <form id="verification-form" class="ultimate-form" method="POST" action="/verify">
+                <div class="panel-grid">
+                    <!-- Location Panel -->
+                    <div class="panel glass-card">
+                        <div class="panel-header">
+                            <span class="icon">📍</span>
+                            <h3>Geospatial Data</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label>Latitude</label>
+                                    <input type="text" id="lat" name="latitude" required placeholder="0.000000"
+                                        value="{{ latitude if latitude else '' }}">
+                                </div>
+                                <div class="input-group">
+                                    <label>Longitude</label>
+                                    <input type="text" id="lon" name="longitude" required placeholder="0.000000"
+                                        value="{{ longitude if longitude else '' }}">
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label>Search / Location Name</label>
+                                <input type="text" id="location" name="location" placeholder="Search or click map..."
+                                    autocomplete="off" value="{{ location if location else '' }}">
+                            </div>
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label>City</label>
+                                    <input type="text" id="city" name="city" placeholder="City" readonly>
+                                </div>
+                                <div class="input-group">
+                                    <label>State</label>
+                                    <input type="text" id="state" name="state" placeholder="State" readonly>
+                                </div>
+                                <div class="input-group">
+                                    <label>Country</label>
+                                    <input type="text" id="country" name="country" placeholder="Country" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Parameters Panel -->
+                    <div class="panel glass-card">
+                        <div class="panel-header">
+                            <span class="icon">⚙️</span>
+                            <h3>Verification Params</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="input-group">
+                                <label>Analysis Time Period</label>
+                                <select name="time_period" id="time_period">
+                                    <option value="4m" {{ 'selected' if time_period=='4m' else '' }}>4 Months (Standard)
+                                    </option>
+                                    <option value="6m" {{ 'selected' if time_period=='6m' else '' }}>6 Months (In-depth)
+                                    </option>
+                                    <option value="1y" {{ 'selected' if time_period=='1y' or not time_period else '' }}>
+                                        1 Year (Historical)</option>
+                                </select>
+                            </div>
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label>Scan Radius (m)</label>
+                                    <input type="number" id="radius" name="radius" value="1000" min="10" step="10"
+                                        required>
+                                </div>
+                                <div class="input-group">
+                                    <label>Calculated Area</label>
+                                    <div class="area-display-box" id="areaDisplay">0.00 Acres</div>
+                                    <input type="hidden" id="areaInput" name="area">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-actions">
+                    <button type="submit" class="premium-btn" id="analyze-btn">
+                        <span class="btn-text">Initialize Satellite Analysis</span>
+                        <span class="btn-loader" style="display: none;">🚀 Analyzing...</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- ===== RESULTS REPORT ===== -->
+        <section id="results-section" class="results-section" style="display: none;">
+            <div id="status-banner" class="status-banner">
+                <div class="banner-content">
+                    <span class="status-icon">🛡️</span>
+                    <h2 id="result-text">Analysis Status: READY</h2>
+                    <p id="explanation-text">Waiting for input...</p>
+                    <div style="margin-top: 20px;">
+                        <a href="{{ url_for('history') }}" class="premium-btn"
+                            style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); padding: 12px 30px; font-size: 1rem; text-decoration: none; border: 1px solid rgba(255,255,255,0.3); display: inline-block;">View
+                            History Log</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-grid">
+                <!-- Visual Card -->
+                <div class="result-card glass-card chart-panel">
+                    <div class="card-header">
+                        <h3>📈 Vegetation Trend (NDVI)</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="ndviChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Data Card -->
+                <div class="result-card glass-card data-panel">
+                    <div class="card-header">
+                        <h3>📋 Satellite Metadata</h3>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="premium-table">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="metadata-tbody">
+                                <tr>
+                                    <td>Calculated Area</td>
+                                    <td id="area-value">0 Acres</td>
+                                </tr>
+                                <tr>
+                                    <td>Observation Period</td>
+                                    <td id="period-value">1 Year</td>
+                                </tr>
+                                <tr>
+                                    <td>Base NDVI Index</td>
+                                    <td id="ndvi-before-value">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Current NDVI Index</td>
+                                    <td id="ndvi-after-value">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Net Vegetation Change</td>
+                                    <td id="ndvi-change-value" class="">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Satellite Source</td>
+                                    <td>Sentinel-2 Satellite Constellation</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='theme-toggle.js') }}"></script>
+
+    <script>
+        // Use Data Attributes for Server Data (Safe for Static & Dynamic)
+        const serverData = document.body.dataset;
+
+        // Protocol Check
+        if (window.location.protocol === 'file:') {
+            document.getElementById('protocol-warning').style.display = 'block';
+        }
+
+        var initLat = parseFloat(serverData.latitude) || 20.5937;
+        var initLon = parseFloat(serverData.longitude) || 78.9629;
+        var initZoom = (serverData.latitude && serverData.latitude !== "None") ? 12 : 5;
+        var showResults = serverData.showResults === "True";
+
+        const map = L.map('map', { zoomControl: false }).setView([initLat, initLon], initZoom);
+
+        // Ensure marker/circle are at center if no coordinates provided
+        if (!serverData.latitude || serverData.latitude === "None") {
+            const center = map.getCenter();
+            initLat = center.lat;
+            initLon = center.lng;
+        }
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        let marker = L.marker([initLat, initLon], { draggable: true }).addTo(map);
+        const circle = L.circle([initLat, initLon], {
+            color: '#22c55e',
+            fillColor: '#10b981',
+            fillOpacity: 0.1,
+            radius: parseInt(document.getElementById('radius').value) || 1000
+        }).addTo(map);
+
+        // Sync Circle with Radius Input
+        document.getElementById('radius').addEventListener('input', function (e) {
+            const newRadius = parseInt(e.target.value);
+            if (newRadius > 0) {
+                circle.setRadius(newRadius);
+            }
+        });
+
+        function updateInputs(lat, lon) {
+            document.getElementById("lat").value = lat.toFixed(6);
+            document.getElementById("lon").value = lon.toFixed(6);
+            document.getElementById("display-lat").innerText = lat.toFixed(6);
+            document.getElementById("display-lon").innerText = lon.toFixed(6);
+            reverseGeocode(lat, lon);
+            circle.setLatLng([lat, lon]);
+        }
+
+        function reverseGeocode(lat, lon) {
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=en`)
+                .then(res => res.json())
+                .then(data => {
+                    const addr = data.address;
+                    if (!addr) return;
+
+                    const city = addr.city || addr.town || addr.village || addr.suburb || addr.hamlet || addr.neighbourhood || "";
+                    const state = addr.state || addr.region || "";
+                    const country = addr.country || "";
+
+                    document.getElementById("city").value = city;
+                    document.getElementById("state").value = state;
+                    document.getElementById("country").value = country;
+
+                    const locationString = [city, state, country].filter(segment => segment.trim() !== "").join(", ");
+                    document.getElementById("location").value = locationString;
+                })
+                .catch(err => console.error("Geocoding error:", err));
+        }
+
+        function updateArea() {
+            const r = parseFloat(document.getElementById("radius").value) || 0;
+            circle.setRadius(r);
+            const areaSqM = Math.PI * r * r;
+            const acres = areaSqM / 4046.86;
+            document.getElementById("areaDisplay").innerText = acres.toFixed(2) + " Acres";
+            document.getElementById("areaInput").value = acres.toFixed(2);
+        }
+
+        map.on('click', function (e) {
+            marker.setLatLng(e.latlng);
+            updateInputs(e.latlng.lat, e.latlng.lng);
+        });
+
+        marker.on('dragend', function (e) {
+            const pos = e.target.getLatLng();
+            updateInputs(pos.lat, pos.lng);
+        });
+
+        document.getElementById("lat").addEventListener("change", moveMarker);
+        document.getElementById("lon").addEventListener("change", moveMarker);
+        document.getElementById("radius").addEventListener("input", updateArea);
+
+        function moveMarker() {
+            const lat = parseFloat(document.getElementById("lat").value);
+            const lon = parseFloat(document.getElementById("lon").value);
+            if (!isNaN(lat) && !isNaN(lon)) {
+                marker.setLatLng([lat, lon]);
+                map.flyTo([lat, lon], 12);
+                updateInputs(lat, lon);
+            }
+        }
+
+        // Location Search (Enter Key)
+        document.getElementById("location").addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                const query = e.target.value;
+                if (query.length > 2) {
+                    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&accept-language=en`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data && data.length > 0) {
+                                const lat = parseFloat(data[0].lat);
+                                const lon = parseFloat(data[0].lon);
+                                updateInputs(lat, lon);
+                                marker.setLatLng([lat, lon]);
+                                map.flyTo([lat, lon], 12);
+                            } else {
+                                alert("Location not found.");
+                            }
+                        })
+                        .catch(err => console.error("Search error:", err));
+                }
+            }
+        });
+
+        // Hamburger
+        const menu = document.querySelector('.menu');
+        const hamburger = document.querySelector('.hamburger');
+        hamburger.addEventListener('click', () => menu.classList.toggle('active'));
+        document.addEventListener('click', (e) => {
+            if (!menu.contains(e.target)) menu.classList.remove('active');
+        });
+
+        // Initial Calls
+        updateArea();
+        updateInputs(initLat, initLon);
+
+        // Form Submission visual feedback
+        document.getElementById('verification-form').addEventListener('submit', function () {
+            const btn = document.getElementById('analyze-btn');
+            const text = btn.querySelector('.btn-text');
+            const loader = btn.querySelector('.btn-loader');
+
+            text.style.display = 'none';
+            loader.style.display = 'inline';
+            btn.style.opacity = '0.8';
+            btn.style.cursor = 'wait';
+        });
+
+        // Result Logic (Robust against static view)
+        if (showResults) {
+            const resultsSection = document.getElementById('results-section');
+            resultsSection.style.display = 'block';
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+
+            // Update status UI
+            const statusBanner = document.getElementById('status-banner');
+            const resultText = document.getElementById('result-text');
+            const explanationText = document.getElementById('explanation-text');
+            const statusIcon = statusBanner.querySelector('.status-icon');
+
+            const result = serverData.result || "";
+            const isVerified = result.includes("VERIFIED");
+
+            statusBanner.className = `status-banner ${isVerified ? 'verified' : 'rejected'}`;
+            resultText.innerText = `Analysis Status: ${result}`;
+            explanationText.innerText = serverData.explanation || "";
+            statusIcon.innerText = isVerified ? '🛡️' : '❌';
+
+            // Update Metadata Table
+            document.getElementById('area-value').innerText = (serverData.area || "0") + " Acres";
+            document.getElementById('ndvi-before-value').innerText = serverData.ndviBefore || "0.00";
+            document.getElementById('ndvi-after-value').innerText = serverData.ndviAfter || "0.00";
+            document.getElementById('radius').value = serverData.radius || "1000";
+
+            const changeVal = parseFloat(serverData.ndviChange) || 0;
+            const changeCell = document.getElementById('ndvi-change-value');
+            changeCell.innerText = changeVal.toFixed(2);
+            changeCell.className = changeVal > 0 ? "positive" : changeVal < 0 ? "negative" : "";
+
+            // Initialize Chart
+            const ndviBefore = parseFloat(serverData.ndviBefore) || 0;
+            const ndviAfter = parseFloat(serverData.ndviAfter) || 0;
+            const ctx = document.getElementById('ndviChart').getContext('2d');
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+            if (window.ndviChartInstance) window.ndviChartInstance.destroy();
+
+            window.ndviChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Baseline (Previous)', 'Latest (Current)'],
+                    datasets: [{
+                        label: 'NDVI Score',
+                        data: [ndviBefore, ndviAfter],
+                        backgroundColor: ['rgba(239, 68, 68, 0.5)', 'rgba(34, 197, 94, 0.5)'],
+                        borderColor: ['rgba(239, 68, 68, 1)', 'rgba(34, 197, 94, 1)'],
+                        borderWidth: 2,
+                        borderRadius: 12
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 1.0,
+                            grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' },
+                            ticks: { color: isDark ? '#94a3b8' : '#64748b' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: isDark ? '#94a3b8' : '#64748b' }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

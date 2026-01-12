@@ -1,0 +1,89 @@
+/* History Page Styles */
+
+.history-layout {
+    grid-template-columns: 1fr;
+    max-width: 1500px;
+    width: 95%;
+    margin: 2rem auto;
+    padding: 0;
+}
+
+.history-card {
+    min-height: 80vh;
+    padding: 3rem;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+.history-table-container {
+    overflow-x: auto;
+    margin-top: 1rem;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.history-table th {
+    text-align: left;
+    padding: 1.2rem 1rem;
+    color: var(--text-muted);
+    font-weight: 700;
+    border-bottom: 2px solid var(--panel-border);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+}
+
+.history-table td {
+    padding: 1.5rem 1rem;
+    color: var(--text-main);
+    border-bottom: 1px solid var(--panel-border);
+    transition: all 0.2s;
+}
+
+.history-table tr:last-child td {
+    border-bottom: none;
+}
+
+.history-table tr:hover td {
+    background-color: rgba(5, 150, 105, 0.05);
+    transform: scale(1.002);
+}
+
+/* Badges */
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge.pending {
+    background: rgba(251, 191, 36, 0.15);
+    color: #d97706;
+    /* Amber 600 */
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.badge.verified {
+    background: rgba(5, 150, 105, 0.15);
+    color: var(--primary-color);
+    border: 1px solid rgba(5, 150, 105, 0.3);
+}
+
+.badge.rejected {
+    background: rgba(220, 38, 38, 0.15);
+    color: var(--secondary-color);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.active-link {
+    color: var(--primary-color) !important;
+    background: rgba(5, 150, 105, 0.1);
+    font-weight: 700 !important;
+}

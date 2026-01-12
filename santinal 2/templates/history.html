@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styleapp.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='history.css') }}">
+</head>
+
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="header-logo">
+            <h1>🌱 History Log <span class="live-indicator"></span></h1>
+        </div>
+
+        <div class="header-controls">
+            <!-- Minimalist Theme Toggle -->
+            <div class="theme-switch" id="theme-toggle-btn" title="Toggle Dark/Light Mode">
+                <div class="switch-thumb">☀️</div>
+            </div>
+
+            <!-- Hamburger Menu -->
+            <div class="menu">
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="menu-content">
+                    <a href="{{ url_for('dashboard') }}">Dashboard Overview</a>
+                    <a href="{{ url_for('index') }}">Carbon Credit Verification</a>
+                    <a href="{{ url_for('calculator') }}">Carbon Credit Calculator</a>
+                    <a href="{{ url_for('history') }}" class="active-link">History</a>
+                    <a href="{{ url_for('about') }}">About Us</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== HISTORY CONTENT ===== -->
+    <div class="dashboard history-layout">
+        <div class="card history-card">
+            <h2>Recent Verifications</h2>
+            <div class="history-table-container">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Project ID</th>
+                            <th>Location</th>
+                            <th>Area</th>
+                            <th>NDVI Δ</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if history %}
+                        {% for item in history %}
+                        <tr>
+                            <td>{{ item.date }}</td>
+                            <td>#{{ item.project_id }}</td>
+                            <td>{{ item.location }}</td>
+                            <td>{{ item.area }} Acres</td>
+                            <td>{{ item.ndvi_change }} Δ</td>
+                            <td><span class="badge {{ item.status_class }}">{{ item.result }}</span></td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr class="empty-state">
+                            <td colspan="6"
+                                style="text-align: center; padding: 4rem; color: var(--text-muted); font-style: italic;">
+                                <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+                                No verification records found. <br>
+                                Complete a <a href="{{ url_for('index') }}"
+                                    style="color: var(--primary-color);">satellite
+                                    scan</a> to see results here.
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Menu Toggle
+        const menu = document.querySelector('.menu');
+        const hamburger = document.querySelector('.hamburger');
+        hamburger.addEventListener('click', () => menu.classList.toggle('active'));
+        document.addEventListener('click', (e) => {
+            if (!menu.contains(e.target)) menu.classList.remove('active');
+        });
+    </script>
+
+    <script src="{{ url_for('static', filename='theme-toggle.js') }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Credit Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="header-logo">
+            <h1>🌱 Carbon Credit Analysis <span class="live-indicator" title="System Active"></span></h1>
+        </div>
+
+        <div class="header-controls">
+            <!-- Minimalist Theme Toggle -->
+            <div class="theme-switch" id="theme-toggle-btn" title="Toggle Dark/Light Mode">
+                <div class="switch-thumb">☀️</div>
+            </div>
+
+            <!-- Hamburger Menu -->
+            <div class="menu">
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="menu-content">
+                    <a href="{{ url_for('dashboard') }}" class="active-link">Dashboard Overview</a>
+                    <a href="{{ url_for('index') }}">Carbon Credit Verification</a>
+                    <a href="{{ url_for('calculator') }}">Carbon Credit Calculator</a>
+                    <a href="{{ url_for('history') }}">History</a>
+                    <a href="{{ url_for('about') }}">About Us</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== MAIN DASHBOARD ===== -->
+    <div class="dashboard">
+
+        <!-- Hero Section -->
+        <div class="hero">
+            <h2>Start Carbon Credit Verification</h2>
+            <p>
+                Identify and verify plantation claims using advanced satellite imagery and NDVI analysis.
+                Secure your carbon credits now.
+            </p>
+            <a href="{{ url_for('index') }}" class="btn-hero">Verify Now 🚀</a>
+        </div>
+
+        <!-- Card 1 -->
+        <div class="card">
+            <h2>📊 Processed Data</h2>
+            <p>
+                Total Verified: <strong id="verified-count">1,240</strong> Trees<br>
+                Carbon Offset: <strong id="carbon-offset">45.2</strong> Tons
+            </p>
+            <p>
+                Using Sentinel-2 satellite data for real-time validation.
+            </p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="card live-market-card">
+            <div class="card-header">
+                <h2>🌍 Carbon Credit Market</h2>
+                <span class="live-badge">LIVE</span>
+            </div>
+            <div class="market-data">
+                <div class="price-container">
+                    <span class="currency">$</span>
+                    <strong id="market-price">12.50</strong>
+                    <span class="unit">/ Credit</span>
+                </div>
+                <div class="trend-container positive">
+                    <span class="trend-icon">▲</span>
+                    <span class="trend-value">+2.4%</span>
+                    <span class="trend-time">past hour</span>
+                </div>
+            </div>
+            <div class="mini-chart">
+                <div class="chart-bar" style="height: 40%" data-value="$11.80"></div>
+                <div class="chart-bar" style="height: 65%" data-value="$12.10"></div>
+                <div class="chart-bar" style="height: 50%" data-value="$11.95"></div>
+                <div class="chart-bar" style="height: 90%" data-value="$12.45"></div>
+                <div class="chart-bar" style="height: 75%" data-value="$12.30"></div>
+                <div class="chart-bar" style="height: 60%" data-value="$12.15"></div>
+                <div class="chart-bar" style="height: 85%" data-value="$12.50"></div>
+            </div>
+        </div>
+        <!-- Card 3 (NDVI - Stable) -->
+        <div class="card">
+            <h2>🛰 Live NDVI Feed</h2>
+            <p>
+                Status: <span style="color: var(--primary-color);">Scanning Area 4B...</span><br>
+                Health Index: <strong id="ndvi-value">0.76</strong> (High)
+            </p>
+            <p>
+                NDVI (Normalized Difference Vegetation Index) is a satellite-based
+                indicator that measures vegetation health.
+            </p>
+        </div>
+    </div>
+
+    <!-- Automation Script -->
+    <script src="{{ url_for('static', filename='theme-toggle.js') }}"></script>
+    <script>
+        // Simulate "Live" Automation
+        function randomizeData() {
+            // Randomize NDVI
+            const ndvi = (0.70 + Math.random() * 0.15).toFixed(2);
+            document.getElementById('ndvi-value').innerText = ndvi;
+
+            // Randomize Verified Trees
+            const trees = Math.floor(1240 + Math.random() * 10);
+            document.getElementById('verified-count').innerText = trees.toLocaleString();
+
+            // Randomize Carbon Offset
+            const offset = (45.2 + Math.random() * 0.5).toFixed(1);
+            document.getElementById('carbon-offset').innerText = offset;
+        }
+
+        // Update every 3 seconds to look "Automated"
+        setInterval(randomizeData, 3000);
+
+        // Menu Toggle Script
+        const menu = document.querySelector('.menu');
+        const hamburger = document.querySelector('.hamburger');
+
+        hamburger.addEventListener('click', () => {
+            menu.classList.toggle('active');
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!menu.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+        });
+    </script>
+
+    <!-- Floating Button -> User will provide code logic later -->
+    <!-- Floating Button -> Connected to Flask Index -->
+
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | Carbon Credit via Satellite</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
+
+        :root {
+            --primary-color: #1b5e20;
+            --text-color: #333;
+            --text-muted: #666;
+            --bg-gradient: linear-gradient(-45deg, #ecfdf5, #d1fae5, #a7f3d0, #ecfccb);
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            --card-hover-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.15);
+            --section-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #34d399;
+            --text-color: #f9fafb;
+            --text-muted: #d1d5db;
+            --bg-gradient: linear-gradient(-45deg, #020617, #064e3b, #14532d, #000000);
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            --card-hover-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.6);
+            --section-bg: rgba(15, 23, 42, 0.6);
+        }
+
+        /* About Section */
+        .about-section {
+            background: var(--section-bg);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            max-width: 900px;
+            margin: 0 auto 50px auto;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Base Styles */
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* Background Animation */
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Layout */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 60px 20px;
+        }
+
+        /* Typography */
+        h1 {
+            text-align: center;
+            color: var(--text-color);
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        p {
+            text-align: center;
+            color: var(--text-color);
+            max-width: 800px;
+            margin: 0 auto 2rem auto;
+            font-size: 1.1rem;
+        }
+
+        /* Team Grid */
+        .team {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        /* Glassmorphism Cards */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            width: 280px;
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .card:hover {
+            transform: translateY(-12px);
+            box-shadow: var(--card-hover-shadow);
+            background: var(--glass-bg);
+            border-color: var(--primary-color);
+            filter: brightness(1.05);
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            color: var(--text-color);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .role-text {
+            font-weight: 600;
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 80px;
+            text-align: center;
+            padding: 30px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="header-logo">
+            <h1
+                style="all: unset; margin: 0; font-weight: 700; font-size: 1.5rem; letter-spacing: 1px; background: linear-gradient(135deg, #166534 0%, #15803d 100%); -webkit-background-clip: text; background-clip: text; color: transparent; display: flex; align-items: center; gap: 12px; text-transform: uppercase;">
+                🌱 About Us <span class="live-indicator"></span>
+            </h1>
+        </div>
+
+        <div class="header-controls">
+            <!-- Minimalist Theme Toggle -->
+            <div class="theme-switch" id="theme-toggle-btn" title="Toggle Dark/Light Mode">
+                <div class="switch-thumb">☀️</div>
+            </div>
+
+            <!-- Hamburger Menu -->
+            <div class="menu">
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="menu-content">
+                    <a href="{{ url_for('dashboard') }}">Dashboard Overview</a>
+                    <a href="{{ url_for('index') }}">Carbon Credit Verification</a>
+                    <a href="{{ url_for('calculator') }}">Carbon Credit Calculator</a>
+                    <a href="{{ url_for('history') }}">History</a>
+                    <a href="{{ url_for('about') }}" class="active-link">About Us</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="about-section">
+            <h1>About Our Project</h1>
+            <p>
+                <strong>Carbon Credit via Satellite</strong> is a hackathon project focused on using
+                satellite data to provide transparent, scalable, and evidence-based carbon credit
+                generation. Our goal is to reduce greenwashing and improve trust in carbon markets
+                through independent verification.
+            </p>
+        </div>
+
+        <h1>Meet the Team</h1>
+
+        <div class="team">
+            <!-- YOUR CARD -->
+            <div class="card">
+                <h3>Antax Patel</h3>
+                <span class="role-text">Role: Team Lead / Developer</span>
+                <p>B.Tech CSE student and lead developer of the team.</p>
+                <p>Specialization in fast hackathon-ready prototypes using Python, web tech, and blockchain.</p>
+                <p>Experience in projects like satellite-based carbon credits and AI/deepfake detection solutions.</p>
+            </div>
+
+            <!-- TEAMMATE 1 -->
+            <div class="card">
+                <h3>Mitanshu Patel</h3>
+                <span class="role-text">Role: Backend / AI / Research</span>
+                <p>B.Tech CSE student. Lead research and system designer, identifying problems and defining AI-driven
+                    approaches.</p>
+                <p>Developed and integrated core AI logic, including data processing and model inference.</p>
+                <p>Built backend infrastructure for seamless API communication and scalable data handling.</p>
+            </div>
+
+            <!-- TEAMMATE 2 -->
+            <div class="card">
+                <h3>Avinash Joshi</h3>
+                <span class="role-text">Role: Frontend / UI / Data</span>
+                <p>Designed a clean, intuitive frontend that makes complex carbon-credit data easy to understand.</p>
+                <p>Built a well-structured and scalable UI using tabs and modular components.</p>
+                <p>Implemented interactive visuals and layouts to present satellite-based insights.</p>
+            </div>
+
+            <!-- TEAMMATE 3 -->
+            <div class="card">
+                <h3>Kavya Maniar</h3>
+                <span class="role-text">Role: Frontend / UI / Data</span>
+                <p>Designed and implemented backend architecture, APIs, data models, and workflows.</p>
+                <p>Integrated AI/ML services and business logic into backend systems for efficient processing.</p>
+                <p>Ensured scalability, performance, and security through optimized queries and modular code.</p>
+            </div>
+
+            <!-- TEAMMATE 4 -->
+            <div class="card">
+                <h3>Harshil Patel</h3>
+                <span class="role-text">Role: PPT Designer / Data Provider</span>
+                <p>Created the project presentation and supported the overall design direction.</p>
+                <p>Designed the About page and suggested UI/UX ideas for the dashboard.</p>
+                <p>Focused on visual clarity and intuitive navigation to communicate the project concept.</p>
+            </div>
+
+
+
+
+
+
+
+            <!-- ADD MORE TEAMMATES IF NEEDED -->
+        </div>
+    </div>
+
+    <footer>
+        © 2026 Carbon Credit via Satellite | Hackathon Project
+    </footer>
+
+    <script src="{{ url_for('static', filename='theme-toggle.js') }}"></script>
+    <script>
+        // Menu Toggle
+        const menu = document.querySelector('.menu');
+        const hamburger = document.querySelector('.hamburger');
+        hamburger.addEventListener('click', () => menu.classList.toggle('active'));
+        document.addEventListener('click', (e) => {
+            if (!menu.contains(e.target)) menu.classList.remove('active');
+        });
+    </script>
+
+</body>
+
+</html>
